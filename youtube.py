@@ -13,7 +13,18 @@ __trigger__ = 'yt '
 __author__ = 'Angelo Gazzola'
 __dependencies__ = []
 
-iconPath = '/home/zxcv/projects/nglgzz/albert_plugins/icons/YouTube.png'
+
+REQUEST_HEADERS = {
+  'User-Agent': (
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)'
+    ' Chrome/62.0.3202.62 Safari/537.36'
+  )
+}
+session = requests.Session()
+session.trust_env = False
+
+iconPath = '/home/zxcv/projects/nglgzz/albert-plugins/icons/YouTube.png'
+
 
 def to_item(suggestion, url=''):
   if len(url) == 0:
@@ -37,21 +48,28 @@ def to_item(suggestion, url=''):
 
 
 def search(query):
-  response = requests.get('https://www.youtube.com/results', params={
-    'search_query': query,
-  })
+  response = session.get('https://www.youtube.com/results',
+    headers=REQUEST_HEADERS,
+    params={
+      'search_query': query,
+    }
+  )
   response = BeautifulSoup(response.text, 'html5lib')
   results = response.body.find_all(lambda el: len(el.get('href', '')) > 7 and len(el.get('title', '')) > 0 and el['href'][:7] == '/watch?')
   results = [(res.text, res['href']) for res in results]
   return [to_item(res[0], res[1]) for res in results]
 
+
 def complete(query):
-  response = requests.get('https://clients1.google.com/complete/search', params={
-    'client': 'youtube',
-    'output': 'toolbar',
-    'hl': 'en',
-    'q': query,
-  })
+  response = session.get('https://clients1.google.com/complete/search',
+    headers=REQUEST_HEADERS,
+    params={
+      'client': 'youtube',
+      'output': 'toolbar',
+      'hl': 'en',
+      'q': query,
+    }
+  )
   response = response.text.lstrip('window.google.ac.h(').rstrip(')')
   suggestions = json.loads(response)[1]
   return [to_item(suggestion[0]) for suggestion in suggestions]

@@ -12,7 +12,18 @@ __trigger__ = 'la '
 __author__ = 'Angelo Gazzola'
 __dependencies__ = []
 
-iconPath = '/home/zxcv/projects/nglgzz/albert_plugins/icons/LearnAnything.png'
+
+REQUEST_HEADERS = {
+  'User-Agent': (
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)'
+    ' Chrome/62.0.3202.62 Safari/537.36'
+  )
+}
+session = requests.Session()
+session.trust_env = False
+
+iconPath = '/home/zxcv/projects/nglgzz/albert-plugins/icons/LearnAnything.png'
+
 
 def to_item(suggestion):
   return Item(
@@ -20,14 +31,14 @@ def to_item(suggestion):
     text=suggestion['key'],
     icon=iconPath,
     subtext=suggestion['key'],
-    actions=[ProcAction('Search on Learn Anything',
-      ['chromium', 'https://learn-anything.xyz/{}'.format(suggestion['id'])]
-    )]
+    actions=[
+      UrlAction('Search on Learn Anything', 'https://learn-anything.xyz/{}'.format(suggestion['id'])),
+    ]
   )
 
 
 def search(query):
-  response = requests.get("https://learn-anything.xyz/api/maps", params={
+  response = session.get("https://learn-anything.xyz/api/maps", params={
     "q": query,
   })
   suggestions = json.loads(response.text)

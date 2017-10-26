@@ -35,7 +35,18 @@ __trigger__ = 'enit '
 __author__ = 'Angelo Gazzola'
 __dependencies__ = []
 
-iconPath = '/home/zxcv/projects/nglgzz/albert_plugins/icons/Wordreference.png'
+
+REQUEST_HEADERS = {
+  'User-Agent': (
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)'
+    ' Chrome/62.0.3202.62 Safari/537.36'
+  )
+}
+session = requests.Session()
+session.trust_env = False
+
+iconPath = '/home/zxcv/projects/nglgzz/albert-plugins/icons/Wordreference.png'
+
 
 def to_item(suggestion):
   return Item(
@@ -43,14 +54,14 @@ def to_item(suggestion):
     text=suggestion,
     icon=iconPath,
     subtext=suggestion,
-    actions=[ProcAction('Search on Wordreference',
-      ['chromium', 'http://www.wordreference.com/enit/{}'.format(suggestion)]
-    )]
+    actions=[
+      UrlAction('Search on Wordreference', 'http://www.wordreference.com/enit/{}'.format(suggestion)),
+    ]
   )
 
 
 def search(query):
-  response = requests.get("http://www.wordreference.com/2012/autocomplete/autocomplete.aspx", params={
+  response = session.get("http://www.wordreference.com/2012/autocomplete/autocomplete.aspx", params={
       "dict": "enit",
       "query": query,
     })

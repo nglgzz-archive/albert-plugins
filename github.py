@@ -12,7 +12,18 @@ __trigger__ = 'gh '
 __author__ = 'Angelo Gazzola'
 __dependencies__ = []
 
-iconPath = '/home/zxcv/projects/nglgzz/albert_plugins/icons/GitHub.png'
+
+REQUEST_HEADERS = {
+  'User-Agent': (
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)'
+    ' Chrome/62.0.3202.62 Safari/537.36'
+  )
+}
+session = requests.Session()
+session.trust_env = False
+
+iconPath = '/home/zxcv/projects/nglgzz/albert-plugins/icons/GitHub.png'
+
 
 def to_item(repo):
   description = repo["description"]
@@ -32,16 +43,19 @@ def to_item(repo):
     icon=iconPath,
     subtext=subtext,
     actions=[
-      ProcAction('View on Github', ['chromium', repo['html_url']]),
+      UrlAction('View on Github', repo['html_url']),
       ProcAction('Clone', ['sh', '-c', 'echo git clone {} | xclip -i -selection clipboard'.format(repo['clone_url'])]),
     ]
   )
 
 
 def search(query):
-  response = requests.get("https://api.github.com/search/repositories", params={
-    "q": query,
-  })
+  response = session.get("https://api.github.com/search/repositories",
+    headers=REQUEST_HEADERS,
+    params={
+      "q": query,
+    }
+  )
 
   if response.json().get('items'):
     repos = sorted(

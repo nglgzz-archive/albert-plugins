@@ -12,7 +12,18 @@ __trigger__ = 'gg '
 __author__ = 'Angelo Gazzola'
 __dependencies__ = []
 
-iconPath = '/home/zxcv/projects/nglgzz/albert_plugins/icons/Google.png'
+
+REQUEST_HEADERS = {
+  'User-Agent': (
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)'
+    ' Chrome/62.0.3202.62 Safari/537.36'
+  )
+}
+session = requests.Session()
+session.trust_env = False
+
+iconPath = '/home/zxcv/projects/nglgzz/albert-plugins/icons/Google.png'
+
 
 def to_item(suggestion):
   return Item(
@@ -20,19 +31,22 @@ def to_item(suggestion):
     text=suggestion,
     icon=iconPath,
     subtext=suggestion,
-    actions=[ProcAction('Search on Google',
-      ['chromium', 'https://google.com/search?q={}'.format(suggestion)]
-    )]
+    actions=[
+      UrlAction('Search on Google', 'https://google.com/search?q={}'.format(suggestion)),
+    ]
   )
 
 
 def search(query):
-  response = requests.get('https://clients1.google.com/complete/search', params={
-    'client': 'firefox',
-    'output': 'toolbar',
-    'hl': 'en',
-    'q': query,
-  })
+  response = session.get('https://clients1.google.com/complete/search',
+    headers=REQUEST_HEADERS,
+    params={
+      'client': 'firefox',
+      'output': 'toolbar',
+      'hl': 'en',
+      'q': query,
+    }
+  )
   suggestions = json.loads(response.text)[1]
   return [to_item(suggestion) for suggestion in suggestions]
 
