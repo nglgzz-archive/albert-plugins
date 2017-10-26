@@ -2,6 +2,7 @@
   Search GitHub repos
 """
 from albertv0 import *
+from os import path
 import requests
 import json
 
@@ -22,7 +23,7 @@ REQUEST_HEADERS = {
 session = requests.Session()
 session.trust_env = False
 
-iconPath = '/home/zxcv/projects/nglgzz/albert-plugins/icons/GitHub.png'
+iconPath = path.dirname(__file__) + '/icons/GitHub.png'
 
 
 def to_item(repo):
@@ -44,7 +45,7 @@ def to_item(repo):
     subtext=subtext,
     actions=[
       UrlAction('View on Github', repo['html_url']),
-      ProcAction('Clone', ['sh', '-c', 'echo git clone {} | xclip -i -selection clipboard'.format(repo['clone_url'])]),
+      ClipAction('Copy clone url', repo['clone_url']),
     ]
   )
 

@@ -2,8 +2,10 @@
   Get suggestions from Google
 """
 from albertv0 import *
+from os import path
 import requests
 import json
+
 
 __iid__ = 'PythonInterface/v0.1'
 __prettyname__ = 'Google Suggestions'
@@ -22,7 +24,7 @@ REQUEST_HEADERS = {
 session = requests.Session()
 session.trust_env = False
 
-iconPath = '/home/zxcv/projects/nglgzz/albert-plugins/icons/Google.png'
+iconPath = path.dirname(__file__) + '/icons/Google.png'
 
 
 def to_item(suggestion):

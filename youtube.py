@@ -2,6 +2,7 @@
   Get suggestions from Youtube
 """
 from albertv0 import *
+from os import path
 from bs4 import BeautifulSoup
 import requests
 import json
@@ -23,7 +24,7 @@ REQUEST_HEADERS = {
 session = requests.Session()
 session.trust_env = False
 
-iconPath = '/home/zxcv/projects/nglgzz/albert-plugins/icons/YouTube.png'
+iconPath = path.dirname(__file__) + '/icons/YouTube.png'
 
 
 def to_item(suggestion, url=''):

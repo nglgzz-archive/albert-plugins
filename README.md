@@ -39,7 +39,7 @@ Here's a list of the plugins and a description of how they work.
 
 **Google (gg)**
 Get suggestions like the ones you get when searching on Google. When you select
-an item the corresponding searchbar is opened in chromium.
+an item the corresponding searchbar is opened in your default browser.
 
 **YouTube (yt)**
 Same as above but it's for YouTube. When you select an item a script is called

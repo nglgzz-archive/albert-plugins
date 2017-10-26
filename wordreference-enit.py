@@ -2,6 +2,7 @@
   Wordreference autocompletion (enit)
 """
 from albertv0 import *
+from os import path
 import requests
 import json
 
@@ -45,7 +46,7 @@ REQUEST_HEADERS = {
 session = requests.Session()
 session.trust_env = False
 
-iconPath = '/home/zxcv/projects/nglgzz/albert-plugins/icons/Wordreference.png'
+iconPath = path.dirname(__file__) + '/icons/Wordreference.png'
 
 
 def to_item(suggestion):
