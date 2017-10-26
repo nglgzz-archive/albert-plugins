@@ -4,6 +4,7 @@
 from albertv0 import *
 from os import path
 import requests
+import lxml.html
 import json
 
 
@@ -12,7 +13,8 @@ __prettyname__ = 'Google Suggestions'
 __version__ = '1.0'
 __trigger__ = 'gg '
 __author__ = 'Angelo Gazzola'
-__dependencies__ = []
+__dependencies__ = ['lxml', 'cssselect']
+__icon__ = path.dirname(__file__) + '/icons/Google.png'
 
 
 REQUEST_HEADERS = {
@@ -24,22 +26,52 @@ REQUEST_HEADERS = {
 session = requests.Session()
 session.trust_env = False
 
-iconPath = path.dirname(__file__) + '/icons/Google.png'
+
+class SuggestionItem(Item):
+  def __init__(self, suggestion):
+    super().__init__(
+      id=str(hash(suggestion)),
+      icon=__icon__,
+      text=suggestion,
+      completion=__trigger__ + suggestion,
+      actions=[
+        UrlAction(
+          'Search on Google',
+          'https://google.com/search?q={}'.format(suggestion)
+        )
+      ]
+    )
 
 
-def to_item(suggestion):
-  return Item(
-    id=str(hash(suggestion)),
-    text=suggestion,
-    icon=iconPath,
-    subtext=suggestion,
-    actions=[
-      UrlAction('Search on Google', 'https://google.com/search?q={}'.format(suggestion)),
-    ]
-  )
+class ResultItem(Item):
+  def __init__(self, result):
+    super().__init__(
+      id=result[1],
+      icon=__icon__,
+      text=result[0],
+      subtext=result[1],
+      actions=[UrlAction('Search on Google', result[1])]
+    )
 
 
 def search(query):
+  response = session.get('https://google.com/search',
+    headers=REQUEST_HEADERS,
+    params={
+      'client': 'firefox',
+      'output': 'toolbar',
+      'hl': 'en',
+      'q': query,
+    }
+  )
+  get_url = lambda el: el.get('href')
+  html = lxml.html.fromstring(response.text)
+  results = html.cssselect('h3 > a')
+  results = [(r.text_content(), get_url(r)) for r in results]
+  return [ResultItem(r) for r in results]
+
+
+def suggest(query):
   response = session.get('https://clients1.google.com/complete/search',
     headers=REQUEST_HEADERS,
     params={
@@ -50,12 +82,16 @@ def search(query):
     }
   )
   suggestions = json.loads(response.text)[1]
-  return [to_item(suggestion) for suggestion in suggestions]
+  return [SuggestionItem(suggestion) for suggestion in suggestions]
 
 
 def handleQuery(query):
   if query.isTriggered and len(query.string) > 0:
-    items = search(query.string)
-    items.insert(0, to_item(query.string))
+    if query.string[0] == '_':
+      items = search(query.string)
+    else:
+      items = suggest(query.string)
+      items.insert(0, SuggestionItem(query.string))
     return items
-  return []
+
+  return [Item(icon=__icon__, text='Search Google')]

@@ -29,28 +29,31 @@ re_videos = re.compile(r'"contents":(\[{"videoRenderer":.*}\]),"continuations"')
 
 
 def search_to_item(video):
-  text = video['title']['simpleText']
-  subtext = '{} \t| {} | {}'.format(
-    video['shortViewCountText']['simpleText'],
-    video['lengthText']['simpleText'],
-    video['ownerText']['runs'][0]['text'],
-  )
-  actions = [
-    UrlAction('Watch on Youtube', 'https://youtube.com/watch?v={}'.format(video['videoId']))
-  ]
+  try:
+    text = video['title']['simpleText']
+    subtext = '{} \t| {} | {}'.format(
+      video['shortViewCountText']['simpleText'],
+      video['lengthText']['simpleText'],
+      video['ownerText']['runs'][0]['text'],
+    )
+    actions = [
+      UrlAction('Watch on Youtube', 'https://youtube.com/watch?v={}'.format(video['videoId']))
+    ]
   # text = suggestion.strip('\n')
   # subtext = url
   # actions = [ProcAction('Open on YouTube', ['sh', '-c', 'chromix-too rm youtube.com && chromix-too open https://youtube.com{}'.format(url)])]
   # chromix-too ls youtube.com | awk '{print $1}'
   # chromix-too raw chrome.tabs.update 441 '{ "url": "https://..." }'
 
-  return Item(
-    id=video['videoId'],
-    text=text,
-    icon=iconPath,
-    subtext=subtext,
-    actions=actions
-  )
+    return Item(
+      id=video['videoId'],
+      text=text,
+      icon=iconPath,
+      subtext=subtext,
+      actions=actions
+    )
+  except:
+    debug(json.dumps(video))
 
 
 def search(query):
