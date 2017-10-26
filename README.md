@@ -3,6 +3,8 @@ This is a collection of plugins I made for Albert launcher. For now they don't
 do much other than offering suggestions and opening them on the browser when
 selected, but I plan on adding more functionalities, as well as more plugins.
 
+![img](https://thumbs.gfycat.com/BlondLinedGnatcatcher-max-14mb.gif)
+
 
 ## Requirements
 The YouTube plugin requires [chromix-too](https://github.com/smblott-github/chromix-too).
