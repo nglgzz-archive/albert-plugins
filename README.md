@@ -7,29 +7,11 @@ selected, but I plan on adding more functionalities, as well as more plugins.
 
 
 ## Requirements
-The YouTube plugin requires [chromix-too](https://github.com/smblott-github/chromix-too).
-That is used for replacing any existing YouTube tab with the one you create.
-Chromix requires the installation of an extension, running a server, and using a
-client to send the commands. For the server I created a systemd script to run it
-automatically whenever I start my pc. The script looks like this.
-
-```
-[Unit]
-Description=Chromix too
-
-[Service]
-User=zxcv
-ExecStart=/bin/chromix-too-server
-
-[Install]
-WantedBy=multi-user.target
-```
-
-BeautifulSoup4 is also required for the YouTube plugin, and it's used to parse the
-response page to get the links and titles of videos. You can install it using:
+`lxml` is required for the Google plugin. It is used for parsing the results
+pages. It can be installed by running:
 
 ```bash
-pip install beautifulsoup4
+pip install lxml
 ```
 
 The `albert_trigger.sh` script requires xdotool, this script is used to open
@@ -41,14 +23,15 @@ Here's a list of the plugins and a description of how they work.
 
 **Google (gg)**
 Get suggestions like the ones you get when searching on Google. When you select
-an item the corresponding searchbar is opened in your default browser.
+an item the corresponding results page is opened in your default browser. If you
+append `_` to your query you'll get the results directly on albert
+(eg: `gg unixporn reddit_`), and selecting any of the results will open it with
+your default browser.
 
 **YouTube (yt)**
-Same as above but it's for YouTube. When you select an item a script is called
-to prefix your query with an underscore. When searching with an underscore before
-your query (eg: `yt \_panda dub`) you get a list of videos as results, and
-selecting any one of them will replace any existing YouTube tab with that video
-(it's definitely work in progress like the other plugins).
+Same as above but it's for YouTube. When searching with an underscore after
+your query (eg: `yt panda dub_`) you get a list of videos as results, and
+selecting any one of them will open that video with your default browser.
 
 **Learn Anything (la)**
 Get suggestions from [Learn Anything](https://learn-anything.xyz). For now you
