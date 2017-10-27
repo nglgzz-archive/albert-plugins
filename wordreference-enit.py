@@ -4,6 +4,7 @@
 from albertv0 import *
 from os import path
 import requests
+import lxml.html
 import json
 
 """
@@ -35,7 +36,8 @@ __version__ = '1.0'
 __trigger__ = 'enit '
 __author__ = 'Angelo Gazzola'
 __dependencies__ = []
-
+__icon__ = path.dirname(__file__) + '/icons/Wordreference.png'
+__lang__ = 'enit'
 
 REQUEST_HEADERS = {
   'User-Agent': (
@@ -49,30 +51,70 @@ session.trust_env = False
 iconPath = path.dirname(__file__) + '/icons/Wordreference.png'
 
 
-def to_item(suggestion):
-  return Item(
-    id=str(hash(suggestion)),
-    text=suggestion,
-    icon=iconPath,
-    subtext=suggestion,
-    actions=[
-      UrlAction('Search on Wordreference', 'http://www.wordreference.com/enit/{}'.format(suggestion)),
-    ]
-  )
+class SuggestionItem(Item):
+  def __init__(self, suggestion):
+    super().__init__(
+      id=str(hash(suggestion)),
+      icon=__icon__,
+      text=suggestion,
+      completion=__trigger__ + suggestion,
+      actions=[
+        UrlAction(
+          'Search on Wordreference',
+          'http://www.wordreference.com/{}/{}'.format(__lang__, suggestion)
+        )
+      ]
+    )
+
+
+class ResultItem(Item):
+  def __init__(self, result):
+    super().__init__(
+      id=str(hash(str(result[0]) + str(result[1]) + str(result[2]))),
+      icon=__icon__,
+      text=result[2],
+      subtext='{} | {} | {}'.format(result[0], result[1], result[2])
+    )
 
 
 def search(query):
-  response = session.get("http://www.wordreference.com/2012/autocomplete/autocomplete.aspx", params={
-      "dict": "enit",
+  response = session.get(
+    "http://www.wordreference.com/{}/{}".format(__lang__, query),
+    headers=REQUEST_HEADERS
+  )
+  html = lxml.html.fromstring(response.text)
+  selections = html.cssselect('tr[id^="{}"]'.format(__lang__))
+  results = []
+
+  for sel in selections:
+    sel = sel.getchildren()
+    results.append((
+      sel[0].find('strong').text,
+      sel[1].text,
+      sel[2].text
+    ))
+
+  return [ResultItem(r) for r in results]
+
+
+def suggest(query):
+  response = session.get("http://www.wordreference.com/2012/autocomplete/autocomplete.aspx",
+    headers=REQUEST_HEADERS,
+    params={
+      "dict": __lang__,
       "query": query,
-    })
+    }
+  )
   suggestions = response.text.split('\n')
-  return [to_item(suggestion.split('\t')[0]) for suggestion in suggestions if suggestion.split('\t')[0]]
+  return [SuggestionItem(suggestion.split('\t')[0]) for suggestion in suggestions if suggestion.split('\t')[0]]
 
 
 def handleQuery(query):
   if query.isTriggered and len(query.string) > 0:
-    items = search(query.string)
-    items.insert(0, to_item(query.string))
+    if query.string[-1] == '_':
+      items = search(query.string[:-1])
+    else:
+      items = suggest(query.string)
+      items.insert(0, SuggestionItem(query.string))
     return items
   return []

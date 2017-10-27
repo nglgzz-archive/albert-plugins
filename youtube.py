@@ -104,5 +104,6 @@ def handleQuery(query):
       items = search(query.string[:-1])
     else:
       items = complete(query.string)
+      items.insert(0, SuggestionItem(query.string))
     return items
   return []
