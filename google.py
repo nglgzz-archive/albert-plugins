@@ -87,8 +87,8 @@ def suggest(query):
 
 def handleQuery(query):
   if query.isTriggered and len(query.string) > 0:
-    if query.string[0] == '_':
-      items = search(query.string)
+    if query.string[-1] == '_':
+      items = search(query.string[:-1])
     else:
       items = suggest(query.string)
       items.insert(0, SuggestionItem(query.string))

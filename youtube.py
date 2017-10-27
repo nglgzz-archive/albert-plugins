@@ -14,6 +14,7 @@ __version__ = '1.0'
 __trigger__ = 'yt '
 __author__ = 'Angelo Gazzola'
 __dependencies__ = []
+__icon__ = path.dirname(__file__) + '/icons/YouTube.png'
 
 
 REQUEST_HEADERS = {
@@ -24,36 +25,46 @@ REQUEST_HEADERS = {
 }
 session = requests.Session()
 session.trust_env = False
-iconPath = path.dirname(__file__) + '/icons/YouTube.png'
 re_videos = re.compile(r'"contents":(\[{"videoRenderer":.*}\]),"continuations"')
 
 
-def search_to_item(video):
-  try:
-    text = video['title']['simpleText']
-    subtext = '{} \t| {} | {}'.format(
-      video['shortViewCountText']['simpleText'],
-      video['lengthText']['simpleText'],
-      video['ownerText']['runs'][0]['text'],
+class SuggestionItem(Item):
+  def __init__(self, suggestion):
+    super().__init__(
+      id=str(hash(suggestion)),
+      icon=__icon__,
+      text=suggestion,
+      completion=__trigger__ + suggestion,
+      actions=[
+        UrlAction(
+          'Search on YouTube',
+          'https://youtube.com/search?q={}'.format(suggestion)
+        )
+      ]
     )
-    actions = [
-      UrlAction('Watch on Youtube', 'https://youtube.com/watch?v={}'.format(video['videoId']))
-    ]
-  # text = suggestion.strip('\n')
-  # subtext = url
-  # actions = [ProcAction('Open on YouTube', ['sh', '-c', 'chromix-too rm youtube.com && chromix-too open https://youtube.com{}'.format(url)])]
-  # chromix-too ls youtube.com | awk '{print $1}'
-  # chromix-too raw chrome.tabs.update 441 '{ "url": "https://..." }'
 
-    return Item(
-      id=video['videoId'],
-      text=text,
-      icon=iconPath,
-      subtext=subtext,
-      actions=actions
-    )
-  except:
-    debug(json.dumps(video))
+class ResultItem(Item):
+  def __init__(self, video):
+    try:
+      text = video['title']['simpleText']
+      subtext = '{} \t| {} | {}'.format(
+        video['shortViewCountText']['simpleText'],
+        video['lengthText']['simpleText'],
+        video['ownerText']['runs'][0]['text'],
+      )
+      actions = [
+        UrlAction('Watch on Youtube', 'https://youtube.com/watch?v={}'.format(video['videoId']))
+      ]
+
+      super().__init__(
+        id=video['videoId'],
+        text=text,
+        icon=__icon__,
+        subtext=subtext,
+        actions=actions
+      )
+    except:
+      debug(json.dumps(video))
 
 
 def search(query):
@@ -69,21 +80,7 @@ def search(query):
     return [Item(text='No results found')]
 
   videos = json.loads(match.groups()[0])
-  return [search_to_item(video['videoRenderer']) for video in videos if video.get('videoRenderer')]
-
-
-def completion_to_item(suggestion):
-  text = suggestion
-  subtext = suggestion
-  actions = [ProcAction('Search on Youtube', ['sh', '-c', '/home/zxcv/projects/.albert_trigger.sh  "yt _{}"'.format(suggestion)])]
-
-  return Item(
-    id=str(hash(suggestion)),
-    text=text,
-    icon=iconPath,
-    subtext=subtext,
-    actions=actions
-  )
+  return [ResultItem(video['videoRenderer']) for video in videos if video.get('videoRenderer')]
 
 
 def complete(query):
@@ -98,13 +95,13 @@ def complete(query):
   )
   response = response.text.lstrip('window.google.ac.h(').rstrip(')')
   suggestions = json.loads(response)[1]
-  return [completion_to_item(suggestion[0]) for suggestion in suggestions]
+  return [SuggestionItem(suggestion[0]) for suggestion in suggestions]
 
 
 def handleQuery(query):
   if query.isTriggered and len(query.string) > 0:
-    if query.string[0] == '_':
-      items = search(query.string[1:])
+    if query.string[-1] == '_':
+      items = search(query.string[:-1])
     else:
       items = complete(query.string)
     return items
