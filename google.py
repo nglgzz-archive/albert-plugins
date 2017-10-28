@@ -50,7 +50,7 @@ class ResultItem(Item):
       id=result[1],
       icon=__icon__,
       text=result[0],
-      subtext=result[1],
+      subtext=result[1] + '\n' + result[2],
       actions=[UrlAction('Search on Google', result[1])]
     )
 
@@ -79,7 +79,7 @@ def search(query):
       formatted_description.append(description[i-MAX_LINE_LENGTH:i])
     formatted_description.append(description[i:-1])
 
-    items.append((title.text, url + '\n' + '\n'.join(formatted_description)))
+    items.append((title.text, url, '\n'.join(formatted_description)))
 
   return [ResultItem(r) for r in items]
 
