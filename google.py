@@ -59,12 +59,12 @@ def search(query):
   response = session.get('https://google.com/search',
     headers=REQUEST_HEADERS,
     params={
-      'client': 'firefox',
-      'output': 'toolbar',
+      'sourceid': 'chrome',
       'hl': 'en',
       'q': query,
     }
   )
+
   html = lxml.html.fromstring(response.text)
   results = html.cssselect('.rc')
   items = []
@@ -72,12 +72,16 @@ def search(query):
   for result in results:
     title = result.cssselect('h3 > a')[0]
     url = title.get('href')
-    description = result.cssselect('.s .st')[0].text_content()
+
+    description = result.cssselect('.s .st')
     formatted_description = []
 
-    for i in range(MAX_LINE_LENGTH, len(description), MAX_LINE_LENGTH):
-      formatted_description.append(description[i-MAX_LINE_LENGTH:i])
-    formatted_description.append(description[i:-1])
+    if len(description) > 0:
+      description = description[0].text_content()
+
+      for i in range(MAX_LINE_LENGTH, len(description), MAX_LINE_LENGTH):
+        formatted_description.append(description[i-MAX_LINE_LENGTH:i])
+      formatted_description.append(description[i:-1])
 
     items.append((title.text, url, '\n'.join(formatted_description)))
 
