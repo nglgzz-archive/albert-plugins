@@ -95,4 +95,4 @@ def handleQuery(query):
       items = suggest(query.string)
       items.insert(0, SuggestionItem(query.string))
     return items
-  return []
+  return [Item(icon=__icon__, text='Wordreference [enit]')]

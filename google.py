@@ -111,4 +111,4 @@ def handleQuery(query):
       items.insert(0, SuggestionItem(query.string))
     return items
 
-  return [Item(icon=__icon__, text='Search Google')]
+  return [Item(icon=__icon__, text='Google')]

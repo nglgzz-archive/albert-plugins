@@ -12,6 +12,7 @@ __version__ = '1.0'
 __trigger__ = 'gh '
 __author__ = 'Angelo Gazzola'
 __dependencies__ = []
+__icon__ = path.dirname(__file__) + '/icons/GitHub.png'
 
 
 REQUEST_HEADERS = {
@@ -22,8 +23,6 @@ REQUEST_HEADERS = {
 }
 session = requests.Session()
 session.trust_env = False
-
-iconPath = path.dirname(__file__) + '/icons/GitHub.png'
 
 
 def to_item(repo):
@@ -41,7 +40,7 @@ def to_item(repo):
   return Item(
     id=str(repo['id']),
     text=repo['full_name'],
-    icon=iconPath,
+    icon=__icon__,
     subtext=subtext,
     actions=[
       UrlAction('View on Github', repo['html_url']),
@@ -72,4 +71,4 @@ def handleQuery(query):
   if query.isTriggered and len(query.string) > 0:
     items = search(query.string)
     return items
-  return []
+  return [Item(icon=__icon__, text='GitHub repos')]

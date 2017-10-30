@@ -12,6 +12,7 @@ __version__ = '1.0'
 __trigger__ = 'la '
 __author__ = 'Angelo Gazzola'
 __dependencies__ = []
+__icon__ = path.dirname(__file__) + '/icons/LearnAnything.png'
 
 
 REQUEST_HEADERS = {
@@ -23,14 +24,12 @@ REQUEST_HEADERS = {
 session = requests.Session()
 session.trust_env = False
 
-iconPath = path.dirname(__file__) + '/icons/LearnAnything.png'
-
 
 def to_item(suggestion):
   return Item(
     id=suggestion['id'],
     text=suggestion['key'],
-    icon=iconPath,
+    icon=__icon__,
     subtext=suggestion['key'],
     actions=[
       UrlAction('Search on Learn Anything', 'https://learn-anything.xyz/{}'.format(suggestion['id'])),
@@ -50,4 +49,4 @@ def handleQuery(query):
   if query.isTriggered and len(query.string) > 0:
     items = search(query.string)
     return items
-  return []
+  return [Item(icon=__icon__, text='I want to learn')]
