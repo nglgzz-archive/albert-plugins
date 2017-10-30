@@ -7,28 +7,6 @@ import requests
 import lxml.html
 import json
 
-"""
-res = []
-
-rows = document.querySelectorAll('tr')
-rows.forEach((row) => {
-  const FrWord = row.querySelector('.FrWrd strong');
-  const desc = row.querySelector('.FrWrd+td');
-  const ToWord = row.querySelector('.ToWrd');
-
-  if (FrWord && desc && ToWord) {
-    const r = {
-      from: FrWord.textContent,
-      desc: desc.textContent,
-      to: ToWord.textContent,
-    };
-
-    if (r.from && r.desc && r.to) {
-      res.push(r);
-    }
-  }
-})
-"""
 
 __iid__ = 'PythonInterface/v0.1'
 __prettyname__ = 'Wordreference autocompletion (enit)'
