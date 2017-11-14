@@ -30,7 +30,6 @@ def to_item(suggestion):
     id=suggestion['id'],
     text=suggestion['key'],
     icon=__icon__,
-    subtext=suggestion['key'],
     actions=[
       UrlAction('Search on Learn Anything', 'https://learn-anything.xyz/{}'.format(suggestion['id'])),
     ]

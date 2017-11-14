@@ -34,7 +34,7 @@ class SuggestionItem(Item):
       id=str(hash(suggestion)),
       icon=__icon__,
       text=suggestion,
-      completion=__trigger__ + suggestion,
+      completion=__trigger__ + suggestion + '_',
       actions=[
         UrlAction(
           'Search on Google',
@@ -45,12 +45,13 @@ class SuggestionItem(Item):
 
 
 class ResultItem(Item):
-  def __init__(self, result):
+  def __init__(self, result, query):
     super().__init__(
       id=result[1],
       icon=__icon__,
       text=result[0],
       subtext=result[1] + '\n' + result[2],
+      completion=__trigger__ + query + '_',
       actions=[UrlAction('Search on Google', result[1])]
     )
 
@@ -85,7 +86,7 @@ def search(query):
 
     items.append((title.text, url, '\n'.join(formatted_description)))
 
-  return [ResultItem(r) for r in items]
+  return [ResultItem(r, query) for r in items]
 
 
 def suggest(query):

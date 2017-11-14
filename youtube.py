@@ -34,7 +34,7 @@ class SuggestionItem(Item):
       id=str(hash(suggestion)),
       icon=__icon__,
       text=suggestion,
-      completion=__trigger__ + suggestion,
+      completion=__trigger__ + suggestion + '_',
       actions=[
         UrlAction(
           'Search on YouTube',
@@ -44,7 +44,7 @@ class SuggestionItem(Item):
     )
 
 class ResultItem(Item):
-  def __init__(self, video):
+  def __init__(self, video, query):
     try:
       text = video['title']['simpleText']
       subtext = '{} \t| {} | {}'.format(
@@ -60,6 +60,7 @@ class ResultItem(Item):
         id=video['videoId'],
         text=text,
         icon=__icon__,
+        completion=__trigger__ + query + '_',
         subtext=subtext,
         actions=actions
       )
@@ -77,10 +78,11 @@ def search(query):
   match = re_videos.search(response.text)
 
   if not match:
+    debug(query)
     return [Item(text='No results found')]
 
   videos = json.loads(match.groups()[0])
-  return [ResultItem(video['videoRenderer']) for video in videos if video.get('videoRenderer')]
+  return [ResultItem(video['videoRenderer'], query) for video in videos if video.get('videoRenderer')]
 
 
 def complete(query):
