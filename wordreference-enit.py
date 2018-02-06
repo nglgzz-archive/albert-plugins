@@ -35,7 +35,7 @@ class SuggestionItem(Item):
       id=str(hash(suggestion)),
       icon=__icon__,
       text=suggestion,
-      completion=__trigger__ + suggestion,
+      completion=__trigger__ + suggestion + '_',
       actions=[
         UrlAction(
           'Search on Wordreference',
