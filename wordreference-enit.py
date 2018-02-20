@@ -62,6 +62,7 @@ def search(query):
   )
   html = lxml.html.fromstring(response.text)
   selections = html.cssselect('tr[id^="{}"]'.format(__lang__))
+  selections += html.cssselect('tr[id^="iten"]')
   results = []
 
   for sel in selections:
